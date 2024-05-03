@@ -1,32 +1,56 @@
 import os
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from eralchemy2 import render_er
+from eralchemy import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class Users(Base):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    password = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Planets(Base):
+    __tablename__ = 'planets'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    name = Column(String(250), nullable=False)
+    image = Column(String(250), nullable=False)
 
-    def to_dict(self):
-        return {}
+class Characters(Base):
+    __tablename__ = 'characters'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    last_name = Column(String(250))
+    planet_id = Column(Integer, ForeignKey('planets.id'))
+    planet = relationship("Planets")
 
-## Draw from SQLAlchemy base
+class Favorite_type(Base):
+    __tablename__ = 'favorite_type'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(10), nullable=False)
+
+class Favorite(Base):
+    __tablename__ = 'favorite'
+    id = Column(Integer, primary_key=True)
+    relation_id = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship("Users")
+    favorite_type_id = Column(Integer, ForeignKey('favorite_type.id'))
+    favorite_type = relationship("Favorite_type")
+
+# Create an engine that stores data in the local directory's
+# sqlalchemy_example.db file.
+engine = create_engine('sqlite:///sqlalchemy_example.db')
+
+# Create all tables in the engine. This is equivalent to "Create Table"
+# statements in raw SQL.
+Base.metadata.create_all(engine)
+
+# Generate the ER diagram
 render_er(Base, 'diagram.png')
+
