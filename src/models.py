@@ -32,7 +32,12 @@ class Characters(Base):
 class Favorite_type(Base):
     __tablename__ = 'favorite_type'
     id = Column(Integer, primary_key=True)
-    name = Column(String(10), nullable=False)
+    planet_id = Column(Integer, primary_key=True)
+    planet = relationship(Planets)
+    Character_id = Column (Integer, ForeignKey('planets.id'))
+    character = relationship(Characters)
+
+
 
 class Favorite(Base):
     __tablename__ = 'favorite'
